@@ -1,91 +1,77 @@
 // Core
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+// Components
 import TodoItem from '../TodoItem/TodoItem';
-import { deleteCurrentTask, editCurrentTask, changeCurTaskStatus } from '../../api/Api';
+// Engine
+import { getTodoItems } from '../../engine/core/todos/actions';
 
-class ListComponent extends Component {
+function ListComponent(props) {
+  const {
+    getTodoItemsAsync,
+    getTodos,
+    todos,
+    changeHandler,
+    editHandler,
+    deleteHandler,
+  } = props;
 
-  componentDidMount() {
-    this.getTodoDataAsync();
-  }
-
-  getTodoDataAsync = () => {
-    const { getTodos } = this.props;
+  useEffect(() => {
+    getTodoItemsAsync();
     getTodos();
+  }, []);
+
+  const onTaskStatusChange = (id, data) => {
+    changeHandler(id, data);
   };
 
-  onTaskStatusChange = (id, data) => {
-    changeCurTaskStatus(id, data)
-      .then((data) => {
-        const { id } = data;
-        const { form } = this.props;
-
-        form.setState(prevState => {
-          const updatedTodos = prevState.todos.map(todo => {
-            if (todo.id === id) {
-              todo.isDone = !todo.isDone
-            }
-            return todo;
-          })
-          return {
-            todos: updatedTodos
-          }
-        })
-      });
-  }
-
-  onTaskEdit = (id, data) => {
-
-    editCurrentTask(id, data)
-      .then((data) => {
-        const { id } = data;
-        const { form } = this.props;
-
-        form.setState(prevState => {
-          const updatedTodos = prevState.todos.map(todo => {
-            if (todo.id === id) {
-              todo.title = data.title
-            }
-            return todo;
-          })
-          return {
-            todos: updatedTodos
-          }
-        })
-      });
-  }
-
-  onTaskDelete = id => {
-    deleteCurrentTask(id)
-      .then(() => {
-        const { form, todos } = this.props;
-        form.setState({
-          todos: [...todos.filter(todo => todo.id !== id)]
-        })
-      });
-  }
-
-  renderTodoItems = () => {
-    const { todos } = this.props;
-
-    return todos.map(item => (
-      <TodoItem
-        key={item.id}
-        item={item}
-        onTaskStatusChange={this.onTaskStatusChange}
-        onTaskEdit={this.onTaskEdit}
-        onTaskDelete={this.onTaskDelete}
-      />
-    ));
+  const onTaskEdit = (id, data) => {
+    editHandler(id, data);
   };
 
-  render() {
-    return (
-      <div className="todo-list">
-        {this.renderTodoItems()}
-      </div>
-    );
-  }
+  const onTaskDelete = id => {
+    deleteHandler(id);
+  };
+
+  const renderTodoItems = () => {
+    console.log('render ', todos);
+    if (todos) {
+      return todos.map(item => (
+        <TodoItem
+          key={item.id}
+          item={item}
+          onTaskStatusChange={onTaskStatusChange}
+          onTaskEdit={onTaskEdit}
+          onTaskDelete={onTaskDelete}
+        />
+      ));
+    }
+  };
+
+  return (
+    <div className="todo-list">
+      {renderTodoItems()}
+    </div>
+  );
 }
 
-export default ListComponent;
+const mapStateToProps = state => ({
+  todoItems: state.todos.items,
+});
+
+function mapDispatchToProps(dispatch) {
+  return {
+    getTodoItemsAsync: () => dispatch(getTodoItems()),
+  };
+}
+
+ListComponent.propTypes = {
+  getTodoItemsAsync: PropTypes.func,
+};
+
+ListComponent.defaultProps = {
+  getTodoItemsAsync: () => {},
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListComponent);

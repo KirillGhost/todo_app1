@@ -1,29 +1,14 @@
 .todo-item {
   display: flex;
   align-items: center;
-  color: white;
-  padding: 5px;
 }
 
-.todo-text {
-  margin: 5px;
-  text-align: left;
-  width: 100%;
-  border: none;
-  background: none;
-  color: white;
-}
-
-.todo-delete {
-  margin: 5px;
-  height: 100%;
-  width: auto;
-  align-items: right;
-  justify-content: right;
+.todo-edit {
+  padding: 0 5px 0 10px;  
 }
 
 .task-done-style {
   font-style: italic;
-  color: green;
+  color: blue;
   text-decoration: line-through;
-};
+}
