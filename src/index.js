@@ -1,8 +1,10 @@
+// Core
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './containers/App/App';
-import './assets/styles/index.css';
 import * as serviceWorker from './assets/serviceWorker/serviceWorker';
+// Styles
+import './assets/styles/index.css';
 
 const element = document.getElementById('root');
 

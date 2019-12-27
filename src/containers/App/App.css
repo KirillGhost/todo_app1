@@ -2,12 +2,8 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-}
-
 .App-header {
-  background-color: #282c34;
+  background-color: white;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -15,6 +11,7 @@
   color: white;
 }
 
-.App-link {
-  color: #09d3ac;
+.Menu-link {
+  text-decoration: none;
+  color: #2216c7;
 }

@@ -18,13 +18,13 @@ export function addNewTask(value) {
     .then(res => res.data);
 }
 
-export function editCurrentTask(id, title) {
-  return instance.patch(`/posts/${id}`, { title })
+export function changeCurTaskStatus(id, isDone) {
+  return instance.patch(`/posts/${id}`, { isDone })
     .then(res => res.data);
 }
 
-export function changeCurTaskStatus(id, isDone) {
-  return instance.patch(`/posts/${id}`, { isDone })
+export function editCurrentTask(id, title) {
+  return instance.patch(`/posts/${id}`, { title })
     .then(res => res.data);
 }
 
