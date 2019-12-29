@@ -1,5 +1,5 @@
 // Core
-import * as todosTypes from './types';
+import * as todoTypes from './types';
 
 const initialState = {
   error: false,
@@ -12,11 +12,17 @@ export function todosReducer(state = initialState, action) {
   const { payload, type } = action;
 
   switch (type) {
-    case todosTypes.ADD_TODO: {
+    case todoTypes.SET_TODO_LIST: {
+      return {
+        ...state,
+        items: payload,
+      };
+    }
+    case todoTypes.ADD_TODO: {
       return state;
     }
-    case todosTypes.DELETE_TODO:
-    case todosTypes.EDIT_TODO: {
+    case todoTypes.DELETE_TODO:
+    case todoTypes.EDIT_TODO: {
       return state;
     }
     default: {
