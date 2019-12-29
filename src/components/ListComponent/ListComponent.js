@@ -6,21 +6,20 @@ import { connect } from 'react-redux';
 import TodoItem from '../TodoItem/TodoItem';
 // Engine
 import { getTodoItems } from '../../engine/core/todos/actions';
+import { todoListSelector } from '../../engine/config/selectors/todo';
 
 function ListComponent(props) {
   const {
     getTodoItemsAsync,
-    getTodos,
-    todos,
     changeHandler,
     editHandler,
     deleteHandler,
+    todoItems,
   } = props;
 
   useEffect(() => {
     getTodoItemsAsync();
-    getTodos();
-  }, []);
+  }, [getTodoItemsAsync]);
 
   const onTaskStatusChange = (id, data) => {
     changeHandler(id, data);
@@ -34,10 +33,9 @@ function ListComponent(props) {
     deleteHandler(id);
   };
 
-  const renderTodoItems = () => {
-    console.log('render ', todos);
-    if (todos) {
-      return todos.map(item => (
+  return (
+    <div className="todo-list">
+      {todoItems.map(item => (
         <TodoItem
           key={item.id}
           item={item}
@@ -45,19 +43,13 @@ function ListComponent(props) {
           onTaskEdit={onTaskEdit}
           onTaskDelete={onTaskDelete}
         />
-      ));
-    }
-  };
-
-  return (
-    <div className="todo-list">
-      {renderTodoItems()}
+      ))}
     </div>
   );
 }
 
 const mapStateToProps = state => ({
-  todoItems: state.todos.items,
+  todoItems: todoListSelector(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -68,10 +60,18 @@ function mapDispatchToProps(dispatch) {
 
 ListComponent.propTypes = {
   getTodoItemsAsync: PropTypes.func,
+  todoItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      isDone: PropTypes.bool,
+      title: PropTypes.string,
+    }),
+  ),
 };
 
 ListComponent.defaultProps = {
   getTodoItemsAsync: () => {},
+  todoItems: [],
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListComponent);
