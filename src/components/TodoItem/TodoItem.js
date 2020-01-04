@@ -1,36 +1,36 @@
 // Core
-import React, { useRef } from 'react';
-import classnames from 'classnames';
-// Styles
-import './TodoItem.css';
+import React, { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
+import cx from 'classnames';
+// Engine
+import { keyCodes } from '../../engine/config/constants/keyCodes';
+import { setTodoItemStateAsync, deleteTodoItem } from '../../engine/core/todos/actions';
+// Styles
+import './TodoItem.css';
 
 function TodoItem(props) {
   const {
-    item, onTaskStatusChange, onTaskEdit, onTaskDelete,
+    id, isDone, taskStatusChange, title, onTaskEdit, taskDelete,
   } = props;
 
-  const { id, isDone, title } = item;
+  const [edit, setEdit] = useState(false);
 
-  const todoTextClassNames = classnames('todo-text', {
+  const todoTextClassNames = cx('todo-text', {
     'task-done-style': isDone,
   });
 
   const ref = useRef(null);
 
   const changeStatusHandler = () => {
-    onTaskStatusChange(id, !isDone);
+    taskStatusChange({ id, isDone: !isDone });
   };
 
-  const editButtonHandler = (ev) => {
-    ref.current.focus();
-    if (ev.target.value === 'Edit') {
-      ev.target.value = 'Save';
-    } else {
-      editTaskHandler();
-    }
+  const editButtonHandler = () => {
+    setEdit(!edit);
   };
 
   const editTaskHandler = () => {
@@ -38,17 +38,23 @@ function TodoItem(props) {
   };
 
   const deleteTaskHandler = () => {
-    onTaskDelete(id);
+    taskDelete(id);
   };
 
   const keyDownHandler = (ev) => {
-    if ((ev.keyCode === 27) || (ev.keyCode === 13)) {
-      if (ev.keyCode === 27) {
-        ref.current.value=ref.current.defaultValue;
+    if ((ev.keyCode === keyCodes.ESC) || (ev.keyCode === keyCodes.ENTER)) {
+      if (ev.keyCode === keyCodes.ESC) {
+        ref.current.value = ref.current.defaultValue;
       }
       ev.target.blur();
     }
   };
+
+  useEffect(() => {
+    if (edit) {
+      ref.current.focus();
+    }
+  }, [edit]);
 
   return (
     <div className="todo-item">
@@ -66,6 +72,7 @@ function TodoItem(props) {
           className={todoTextClassNames}
           color="primary"
           defaultValue={title}
+          disabled={!edit}
           onBlur={editTaskHandler}
           onKeyDown={keyDownHandler}
         />
@@ -76,10 +83,9 @@ function TodoItem(props) {
           color="primary"
           className="todo-edit-btn"
           size="small"
-          value="Edit"
           onClick={editButtonHandler}
         >
-          Edit
+          {edit ? 'Save' : 'Edit'}
         </Button>
       </div>
       <div>
@@ -98,4 +104,27 @@ function TodoItem(props) {
   );
 }
 
-export default TodoItem;
+TodoItem.propTypes = {
+  id: PropTypes.number.isRequired,
+  isDone: PropTypes.bool,
+  taskStatusChange: PropTypes.func,
+  taskDelete: PropTypes.func,
+  title: PropTypes.string,
+};
+
+TodoItem.defaultProps = {
+  isDone: false,
+  taskStatusChange: () => {},
+  taskEdit: () => {},
+  taskDelete: () => {},
+  title: '',
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    taskStatusChange: taskStatus => dispatch(setTodoItemStateAsync(taskStatus)),
+    taskDelete: id => dispatch(deleteTodoItem(id)),
+  };
+}
+
+export default connect(null, mapDispatchToProps)(TodoItem);

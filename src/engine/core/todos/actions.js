@@ -5,7 +5,7 @@ import { actionCreator } from '../../../lib/helpers/actionCreator';
 // Type
 import * as todoTypes from './types';
 // Api
-import { getTodoData } from '../../../api/Api';
+import { changeCurTaskStatus, getTodoData, deleteCurrentTask } from '../../../api/Api';
 
 export function addTodo(todo) {
   return actionCreator(todoTypes.ADD_TODO, todo);
@@ -15,8 +15,20 @@ export function editTodo(todo) {
   return actionCreator(todoTypes.EDIT_TODO, todo);
 }
 
-export function deleteTodo(id) {
+  export function deleteTodo(id) {
   return actionCreator(todoTypes.DELETE_TODO, id);
+}
+
+export function deleteTodoItem(id) {
+  return (dispatch) => {
+    deleteCurrentTask(id)
+      .then(() => {
+        dispatch(deleteTodo({ id }));
+      })
+      .catch((error) =>  {
+        dispatch(setNotificationMessage(error.message));
+      });
+  };
 }
 
 export function setLoader(isLoading) {
@@ -32,16 +44,30 @@ export function getTodoItems() {
     dispatch(setLoader(true));
     getTodoData()
       .then((data) => {
-        console.log('DATA ', data);
         dispatch(setTodoList(data));
       })
       .catch((error) => {
-        console.error(error);
         dispatch(setNotificationMessage(error.message));
       })
       .finally(() => {
         dispatch(setLoader(false));
       });
   };
-  // return actionCreator(todoTypes.GET_TODO_ITEMS);
+}
+
+export function setTodoItemState(todoItemState) {
+  return actionCreator(todoTypes.SET_TODO_ITEM_STATE, todoItemState);
+}
+
+export function setTodoItemStateAsync(todoItemState) {
+  return (dispatch) => {
+    const { id, isDone} = todoItemState;
+    changeCurTaskStatus(id, isDone)
+      .then(() => {
+        dispatch(setTodoItemState(todoItemState));
+      })
+      .catch((error) => {
+        dispatch(setNotificationMessage(error.message));
+      });
+  };
 }
