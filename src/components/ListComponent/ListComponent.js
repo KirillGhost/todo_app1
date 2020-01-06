@@ -36,13 +36,7 @@ function ListComponent(props) {
   return (
     <div className="todo-list">
       {todoItems.map(item => (
-        <TodoItem
-          key={item.id}
-          item={item}
-          onTaskStatusChange={onTaskStatusChange}
-          onTaskEdit={onTaskEdit}
-          onTaskDelete={onTaskDelete}
-        />
+        <TodoItem {...item} key={item.id} />
       ))}
     </div>
   );
